@@ -1,0 +1,12 @@
+[Unit]
+Description=puma_service
+
+[Service]
+WorkingDirectory=/home/appuser/reddit
+ExecStart=/usr/local/bin/puma
+Restart=always
+RestartSec=10
+SyslogIdentifier=puma_service
+
+[Install]
+WantedBy=default.target
