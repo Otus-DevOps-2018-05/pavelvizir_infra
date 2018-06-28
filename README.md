@@ -209,3 +209,36 @@ gcloud compute instances create reddit-app \
 ```sh
 chmod +x ../config-scripts/create-reddit-vm.sh
 ```
+
+## Homework-6 aka 'terraform-1'
+#### Task \#1:
+##### Create more input variables, 'terraform.tfvars.example', format with 'fmt'.  
+variables.tf:
+```json
+...
+variable private_key_path {
+ description = "Path to the private key used for ssh access"
+}
+variable app_zone {
+ description = "Zone for app"
+ default = "europe-west1-b"
+}
+```
+main.tf:
+```json
+...
+private_key = "${file(var.private_key_path)}"
+...
+zone    = "${var.app_zone}"
+...
+```
+```sh
+terraform fmt
+```
+terraform.tfvars.example:
+```json
+project = "infra-999999"
+public_key_path = "~/.ssh/appuser.pub"
+disk_image = "reddit-base"
+private_key_path = "~/.ssh/appuser"
+```
