@@ -23,3 +23,7 @@ variable app_zone {
   description = "Zone for app"
   default     = "europe-west1-b"
 }
+
+variable "node_count" {
+  default = "1"
+}

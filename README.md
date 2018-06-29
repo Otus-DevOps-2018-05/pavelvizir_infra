@@ -251,5 +251,62 @@ resource "google_compute_project_metadata_item" "project-ssh-keys" {
     value = "[USERNAME_1]:ssh-rsa [KEY_VALUE_1] [USERNAME_1]\n[USERNAME_2]:ssh-rsa [KEY_VALUE_2] [USERNAME_2]"
 }
 ```
-*terraform apply* deletes other ssh keys not defined in template. Hence 'appuser-web' keygot deleted.   
+*terraform apply* deletes other ssh keys not defined in template. Hence 'appuser-web' keyi got deleted.   
+#### Task \#3\*:
+##### Create load-balancer, make second node.  
+> First sub-task with manual *'reddit-app2'* creation lacks flexibility. What if we want 3 or more nodes?  
 
+> Final result with *'count'* described here. Had to create *'target pool'* and *'forwarding rule'* for load balancer to work.
+
+lb.tf:
+```json
+resource "google_compute_target_pool" "default" {
+  name = "instance-pool"
+
+  instances = [
+    "europe-west1-b/reddit-app0",
+    "europe-west1-b/reddit-app1"
+]
+
+  health_checks = [
+    "${google_compute_http_health_check.default.name}",
+  ]
+}
+
+resource "google_compute_http_health_check" "default" {
+  name               = "default"
+  request_path       = "/"
+  port	             = 9292
+  check_interval_sec = 1
+  timeout_sec        = 1
+}
+
+resource "google_compute_forwarding_rule" "default" {
+  name       = "website-forwarding-rule"
+  target     = "${google_compute_target_pool.default.self_link}"
+  port_range = "9292"
+}
+```
+outputs.tf:
+```json
+output "app_external_ip" {
+  value = "${google_compute_instance.app.*.network_interface.0.access_config.0.assigned_nat_ip}"
+}
+output "lb_external_ip" {
+  value = "${google_compute_forwarding_rule.default.ip_address}"
+}
+```
+variables.tf:
+```json
+variable "node_count" {
+  default = "1"
+}
+```
+main.tf:
+```json
+...
+resource "google_compute_instance" "app" {
+  count        = "${var.node_count}"
+  name         = "reddit-app${count.index}"
+...
+```
