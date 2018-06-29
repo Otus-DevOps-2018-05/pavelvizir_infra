@@ -215,7 +215,6 @@ chmod +x ../config-scripts/create-reddit-vm.sh
 ##### Create more input variables, 'terraform.tfvars.example', format with 'fmt'.  
 variables.tf:
 ```json
-...
 variable private_key_path {
  description = "Path to the private key used for ssh access"
 }
@@ -242,3 +241,15 @@ public_key_path = "~/.ssh/appuser.pub"
 disk_image = "reddit-base"
 private_key_path = "~/.ssh/appuser"
 ```
+#### Task \#2\*:  
+##### Add ssh-keys to project metadata with terraform.  
+> Made it without variables, lazy way :-)  
+main.tf:
+```json
+resource "google_compute_project_metadata_item" "project-ssh-keys" {
+    key = "ssh-keys"
+    value = "[USERNAME_1]:ssh-rsa [KEY_VALUE_1] [USERNAME_1]\n[USERNAME_2]:ssh-rsa [KEY_VALUE_2] [USERNAME_2]"
+}
+```
+*terraform apply* deletes other ssh keys not defined in template. Hence 'appuser-web' keygot deleted.   
+
