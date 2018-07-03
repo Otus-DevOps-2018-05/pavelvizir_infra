@@ -346,7 +346,20 @@ gsutil ls
 #### Task \#2\*:
 ##### Configure and test remote backend (Google Cloud Storgage).
 
-TBD  
+```sh
+echo 'terraform {
+  backend "gcs" {
+    bucket  = "test_storage_infra"
+    prefix  = "prod"
+  }
+}'\
+> backend.tf
+terraform init
+```
+Now state lock works when trying to run terraform apply from two different dirs simultaneously:  
+> Acquiring state lock. This may take a few moments...  
+>  
+> Error: Error locking state: Error acquiring the state lock:  
 
 #### Task \#3\*:
 ##### Add provisioner to modules. Make it switchable.
