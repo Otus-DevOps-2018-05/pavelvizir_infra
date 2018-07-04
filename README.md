@@ -467,3 +467,20 @@ module "app" {
 terraform init
 terraform apply
 ```
+
+## Homework-8 aka 'ansible-1'
+#### Task \#1:  
+##### Install ansible, play with it.  
+
+```sh
+ansible-playbook clone.yml
+ansible app -m command -a 'rm -rf ~/reddit'
+ansible-playbook clone.yml
+```
+
+**Результат выполнения команд выше одинаков, т.к. configuration management инструменту должен обеспечивать повторяемость при сохранении условий**
+
+#### Task \#2\*:  
+##### Make *ansible all -m ping* with json inventory.  
+
+TBD
