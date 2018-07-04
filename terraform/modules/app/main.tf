@@ -39,3 +39,32 @@ resource "google_compute_firewall" "firewall_puma" {
   source_ranges = ["0.0.0.0/0"]
   target_tags   = ["reddit-app"]
 }
+
+
+resource "null_resource" "app" {
+ 
+  count = "${var.provision_trigger}"
+
+  connection {
+    host        = "${google_compute_instance.app.network_interface.0.access_config.0.assigned_nat_ip}"
+    type        = "ssh"
+    user        = "appuser"
+    agent       = false
+    private_key = "${file(var.private_key_path)}"
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/files/puma.service"
+    destination = "/tmp/puma.service"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sed -i 's/DATABASE_URL=127.0.0.1/DATABASE_URL=${var.db_internal_ip}/' /tmp/puma.service"
+    ]
+  }
+
+  provisioner "remote-exec" {
+    script = "${path.module}/files/deploy.sh"
+  }
+}
