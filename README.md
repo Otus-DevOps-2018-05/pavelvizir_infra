@@ -483,4 +483,45 @@ ansible-playbook clone.yml
 #### Task \#2\*:  
 ##### Make *ansible all -m ping* with json inventory.  
 
-TBD
+inventory.json:
+```json
+{
+  "app": {
+	"hosts": ["35.233.107.24"]
+	},
+  "db": {
+	"hosts": ["35.233.15.19"]
+  },
+  "_meta": {
+	"hostvars": {
+	  "35.233.107.24": {
+		"host_specific_var": "appserver"
+	  },
+	  "35.233.15.19": {
+		"host_specific_var": "dbserver"
+	  }
+	}
+  }
+} 
+```
+inventory.sh:
+```sh
+#!/usr/bin/env bash
+if [ "$1" == "--list" ] ; then
+  cat inventory.json
+elif [ "$1" == "--host" ]; then
+  echo '{"_meta": {"hostvars": {}}}'
+else
+  echo "{ }"
+fi
+```
+ansible.cfg:
+```
+# inventory = ./inventory
+inventory = ./inventory.sh
+```
+> Now run it:  
+```
+chmod +x inventory.sh
+ansible all -m ping
+```
