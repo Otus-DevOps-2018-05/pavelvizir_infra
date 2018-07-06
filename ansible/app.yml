@@ -1,9 +1,10 @@
 ---
 - name: Configure App
-  hosts: app
+  hosts: "{{ prefix }}app"
   become: true
   vars:
    db_host: 10.132.0.2
+   prefix: '{{ vars["site_prefix"] | default("") }}'
   tasks:
     - name: Add unit file for Puma
       copy:

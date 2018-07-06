@@ -545,7 +545,51 @@ Created multiple playbooks with the same tasks:
 #### Task \#2\*:
 ##### Select dynamic inventory script and start using it.
 
-TBD
+> **gce.py** is the most used, tested etc  
+
+Let's install and configure it.
+
+```sh
+wget https://raw.githubusercontent.com/ansible/ansible/devel/contrib/inventory/gce.{ini,py}
+trizen -S python-apache-libcloud
+chmod +x gce.py
+# download json credentials file
+echo "GCE_PARAMS = ('<service_mail>', '/path/to/json_credentials')
+GCE_KEYWORD_PARAMS = {'project': '<project>', 'datacenter': '<zone>'}"\
+> secrets.py
+echo -e '__pycache__\nsecrets.py' >> ../.gitignore
+sed -i 's/inventory = .\/inventory/inventory = .\/gce.py/' ansible.cfg
+./gce.py --list
+```
+> Now there is a problem, as my hosts are **'app'** and **'db'**, but *gce.py* returns **'reddit-app'** and **'reddit-db'**.  
+> Let's fix it by passing variable *'site_prefix'* to playbooks and using that variable in hostnames.  
+
+site.yml:
+```
+...
+- import_playbook: db.yml
+    site_prefix="reddit-"
+...
+```
+{db,app,deploy}.yml:
+```
+...
+hosts: "{{ prefix }}db"
+...
+vars:
+  ...
+  prefix: '{{ vars["site_prefix"] | default("") }}'
+...
+```
+Now test it:
+```sh
+ansible-playbook site.yml --check
+...
+PLAY RECAP ****************************************************************
+reddit-app                 : ok=7    changed=0    unreachable=0    failed=0   
+reddit-db                  : ok=2    changed=0    unreachable=0    failed=0
+```
+Works! :-)  
 
 #### Task \#3:
 ##### Change packer's bash scripts to ansible playbooks.

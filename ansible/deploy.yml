@@ -1,6 +1,8 @@
 ---
 - name: deploy app
-  hosts: app
+  hosts: "{{ prefix }}app"
+  vars:
+    prefix: '{{ vars["site_prefix"] | default("") }}'
   tasks:
     - name: Fethc the latest version of application code
       git:
