@@ -525,3 +525,30 @@ inventory = ./inventory.sh
 chmod +x inventory.sh
 ansible all -m ping
 ```
+
+## Homework-9 aka 'ansible-2'
+#### Task \#1:  
+##### First 65 pages of homework pdf :-)
+
+> Had to add switch to provisioning of db server in terraform.  
+> Also added needed outputs to terraform:  
+>   {app,db}_external_ip, db_internal_db  
+
+Created multiple playbooks with the same tasks:  
+ * *reddit_app_one_play.yml*: one play per playbook  
+ * *reddit_app_multiple_plays.yml*: multiple plays per playbook  
+ * *site.yml*: includes multiple playbooks:  
+   * *db.yml*: db play  
+   * *app.yml*: app play  
+   * *deploy.yml*: deploy app play  
+
+#### Task \#2\*:
+##### Select dynamic inventory script and start using it.
+
+TBD
+
+#### Task \#3:
+##### Change packer's bash scripts to ansible playbooks.
+
+TBD
+

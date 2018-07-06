@@ -14,3 +14,8 @@ variable db_disk_image {
 variable private_key_path {
   description = "Path to the private key used for ssh access"
 }
+
+variable provision_trigger {
+  description = "To provision or not"
+  default = true
+}

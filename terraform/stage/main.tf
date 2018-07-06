@@ -11,7 +11,7 @@ module "app" {
   app_disk_image   = "${var.app_disk_image}"
   private_key_path = "${var.private_key_path}"
   db_internal_ip   = "${module.db.db_internal_ip}" 
-#  provision_trigger = false
+  provision_trigger = false
 }
 
 module "db" {
@@ -20,6 +20,7 @@ module "db" {
   zone            = "${var.zone}"
   db_disk_image   = "${var.db_disk_image}"
   private_key_path = "${var.private_key_path}"
+  provision_trigger = false
 }
 
 module "vpc" {
