@@ -592,7 +592,34 @@ reddit-db                  : ok=2    changed=0    unreachable=0    failed=0
 Works! :-)  
 
 #### Task \#3:
-##### Change packer's bash scripts to ansible playbooks.
+##### Change packer's bash scripts to ansible playbooks.  
 
-TBD
+> Working with *packer_app.yml* as an example here. Working with *packer_db.yml* is the same, only contents differs.
+
+packer_app.yml:
+```
+...
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - ruby-full
+        - ruby-bundler
+        - build-essential
+```
+packer/app.json:
+```
+"provisioners": [
+    {
+        "type": "ansible",
+	"playbook_file": "ansible/packer_app.yml"
+    }
+  ]
+```
+Now test it!
+```sh
+packer build --var-file=packer/variables.json packer/app.json
+```
+
+TBC
 
