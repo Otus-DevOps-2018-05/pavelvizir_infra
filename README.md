@@ -594,7 +594,7 @@ Works! :-)
 #### Task \#3:
 ##### Change packer's bash scripts to ansible playbooks.  
 
-> Working with *packer_app.yml* as an example here. Working with *packer_db.yml* is the same, only contents differs.
+> Working with *packer_app.yml* as an example here. Working with *packer_db.yml* is the same, only content differs.
 
 packer_app.yml:
 ```
@@ -620,6 +620,12 @@ Now test it!
 ```sh
 packer build --var-file=packer/variables.json packer/app.json
 ```
-
-TBC
-
+Test complete solution now after editing *'db'* files:
+```sh
+packer build --var-file=packer/variables.json packer/db.json
+cd terraform/stage && terraform apply
+cd ../../ansible && ansible-playbook site.yml
+firefox http://$(terraform output app_external_ip):9292
+# WORKS!
+cd ../terraform/stage && terraform destroy
+```
