@@ -1,0 +1,9 @@
+---
+- name: Configure MongoDB
+  hosts: "{{ prefix }}db"
+  become: true
+  vars:
+    prefix: '{{ vars["site_prefix"] | default("") }}'
+
+  roles:
+    - db

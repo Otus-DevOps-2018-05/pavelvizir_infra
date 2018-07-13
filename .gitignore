@@ -7,3 +7,5 @@ packer/variables.json
 *.retry
 __pycache__
 secrets.py
+jdauphant.nginx
+vault.key
