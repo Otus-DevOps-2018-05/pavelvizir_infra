@@ -1,8 +1,8 @@
 ---
 - import_playbook: db.yml
-  #    site_prefix="reddit-"
+    site_prefix="reddit-"
 - import_playbook: app.yml
-  #  site_prefix="reddit-"
+    site_prefix="reddit-"
 - import_playbook: deploy.yml
-  #  site_prefix="reddit-"
+    site_prefix="reddit-"
 - import_playbook: users.yml
