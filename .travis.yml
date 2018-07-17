@@ -16,8 +16,8 @@ script:
 - ansible-lint ansible/playbooks/site.yml
 - packer validate -var-file=packer/variables.json.example packer/app.json 
 - packer validate -var-file=packer/variables.json.example packer/app.json 
-- cd terraform/prod && terraform init -backend=false && terraform validate -var-file=terraform.tfvars.example && tflint
-- cd terraform/stage && terraform init -backend=false && terraform validate -var-file=terraform.tfvars.example && tflint
+- cd terraform/stage && terraform init -backend=false && tlfint && terraform validate -var-file=terraform.tfvars.example
+- cd ../prod && terraform init -backend=false && tflint && terraform validate -var-file=terraform.tfvars.example
 notifications:
   slack:
     rooms:
