@@ -3,7 +3,7 @@ Description=Puma HTTP Server
 After=network.target
 
 [Service]
-Environment="DATABASE_URL=127.0.0.1"
+Environment="DATABASE_URL=${db_address}"
 Type=simple
 User=appuser
 WorkingDirectory=/home/appuser/reddit

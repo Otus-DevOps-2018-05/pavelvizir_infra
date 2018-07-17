@@ -54,17 +54,22 @@ resource "null_resource" "app" {
   }
 
   provisioner "file" {
-    source      = "${path.module}/files/puma.service"
+    content     = "${data.template_file.user_data.rendered}"
     destination = "/tmp/puma.service"
   }
 
   provisioner "remote-exec" {
-    inline = [
-      "sed -i 's/DATABASE_URL=127.0.0.1/DATABASE_URL=${var.db_internal_ip}/' /tmp/puma.service"
-    ]
-  }
-
-  provisioner "remote-exec" {
     script = "${path.module}/files/deploy.sh"
+  }
+}
+
+data "template_file" "user_data" {
+
+  count = "${var.provision_trigger}"
+
+  template = "${file("${path.module}/files/puma.service")}"
+
+  vars {
+    db_address = "${var.db_internal_ip}"
   }
 }

@@ -4,14 +4,14 @@ pavelvizir Infra repository
 [![Build Status](https://travis-ci.com/Otus-DevOps-2018-05/pavelvizir_infra.svg?branch=master)](https://travis-ci.com/Otus-DevOps-2018-05/pavelvizir_infra)
 
 ## Table of contents:
-- [Homework-3](#Homework-3)
-- [Homework-4](#Homework-4)
-- [Homework-5](#Homework-5)
-- [Homework-6 aka 'terraform-1'](#Homework-6-aka-'terraform-1')
-- [Homework-7 aka 'terraform-2](#Homework-7-aka-'terraform-2')
-- [Homework-8 aka 'ansible-1'](#Homework-8-aka-'ansible-1')
-- [Homework-9 aka 'ansible-2'](#Homework-9-aka-'ansible-2')
-- [Homework-10 aka 'ansible-3'](#Homework-10-aka-'ansible-3')
+- [Homework-3](#homework-3)
+- [Homework-4](#homework-4)
+- [Homework-5](#homework-5)
+- [Homework-6 aka 'terraform-1'](#homework-6-aka-'terraform-1')
+- [Homework-7 aka 'terraform-2](#homework-7-aka-'terraform-2')
+- [Homework-8 aka 'ansible-1'](#homework-8-aka-'ansible-1')
+- [Homework-9 aka 'ansible-2'](#homework-9-aka-'ansible-2')
+- [Homework-10 aka 'ansible-3'](#homework-10-aka-'ansible-3')
 
 ## Homework-3
 #### Task \#1:  
@@ -706,7 +706,7 @@ README.md:
 ```
 
 .travis.yml:
-```
+```yaml
 install:
 - sudo pip install ansible
 - sudo pip install ansible-lint
