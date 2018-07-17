@@ -30,11 +30,11 @@
 	{
             "type": "shell",
 	    "remote_folder": "/home/appuser",
-            "script": "scripts/deploy_puma.sh"
+            "script": "packer/scripts/deploy_puma.sh"
 	},
 	{
             "type": "file",
-	    "source": "files/puma.service",
+	    "source": "packer/files/puma.service",
 	    "destination": "/tmp/puma.service"
 	},
 	{
