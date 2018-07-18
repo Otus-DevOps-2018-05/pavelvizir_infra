@@ -1,9 +1,7 @@
 ---
 - name: Configure MongoDB
-  hosts: "{{ prefix }}db"
+  hosts: tag_reddit-db
   become: true
-  vars:
-    prefix: '{{ vars["site_prefix"] | default("") }}'
 
   roles:
     - db

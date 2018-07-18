@@ -1,8 +1,6 @@
 ---
 - name: deploy app
-  hosts: "{{ prefix }}app"
-  vars:
-    prefix: '{{ vars["site_prefix"] | default("") }}'
+  hosts: tag_reddit-app
   tasks:
     - name: Fetch the latest version of application code
       git:

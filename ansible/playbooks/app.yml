@@ -1,9 +1,7 @@
 ---
 - name: Configure App
-  hosts: "{{ prefix }}app"
+  hosts: tag_reddit-app
   become: true
-  vars:
-   prefix: '{{ vars["site_prefix"] | default("") }}'
 
   roles:
     - app

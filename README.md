@@ -7,11 +7,11 @@ pavelvizir Infra repository
 - [Homework-3](#homework-3)
 - [Homework-4](#homework-4)
 - [Homework-5](#homework-5)
-- [Homework-6 aka 'terraform-1'](#homework-6-aka-'terraform-1')
-- [Homework-7 aka 'terraform-2](#homework-7-aka-'terraform-2')
-- [Homework-8 aka 'ansible-1'](#homework-8-aka-'ansible-1')
-- [Homework-9 aka 'ansible-2'](#homework-9-aka-'ansible-2')
-- [Homework-10 aka 'ansible-3'](#homework-10-aka-'ansible-3')
+- [Homework-6 aka 'terraform-1'(#homework-6-aka-terraform-1)
+- [Homework-7 aka 'terraform-2'](#homework-7-aka-terraform-2)
+- [Homework-8 aka 'ansible-1'](#homework-8-aka-ansible-1)
+- [Homework-9 aka 'ansible-2'](#homework-9-aka-ansible-2)
+- [Homework-10 aka 'ansible-3'](#homework-10-aka-ansible-3)
 
 ## Homework-3
 #### Task \#1:  
@@ -679,17 +679,23 @@ ansible/playbooks/app.yml:
     - jdauphant.nginx
 ```
 
-#### Task \#2\*:
-##### Use dynamic inventory in *prod* and *stage* environments.
+#### Task \#2\*:  
+##### Use dynamic inventory in *prod* and *stage* environments.  
 
-> Same as before, but had to create host_vars in both environments.
-> Copied gce.py to both environments as well.
+**First approach, abandoned**:  
+> Same as before, but had to create host_vars in both environments.  
+> Copied gce.py to both environments as well.  
 
 ```sh
 mkdir environments/{prod,stage}/host_vars
 cp environments/stage/group_vars/app environments/{prod,stage}/host_vars/reddit-app
 cp environments/stage/group_vars/db environments/{prod,stage}/host_vars/reddit-db
 ```
+
+**Second approach**:
+Simply renamed groups in playbooks, group_vars and static inventory:  
+ * *app* -> *tag_reddit-app*
+ * *db*  -> *tag_reddit-db*
 
 #### Task \#3\*:
 ##### Make more travis tests.
@@ -717,8 +723,14 @@ install:
 - touch ~/.ssh/appuser.pub
 script:
 - ansible-lint -v ansible/playbooks/*.yml
-- packer validate -var-file=packer/variables.json.example packer/db.json 
 - find packer -name "*.json" -type f -print0 | xargs -0 -n1 packer validate -var-file=packer/variables.json.example
 - cd terraform/stage && terraform init -backend=false && tflint --var-file=terraform.tfvars.example && terraform validate -var-file=terraform.tfvars.example
 - cd ../prod && terraform init -backend=false && tflint --var-file=terraform.tfvars.example && terraform validate -var-file=terraform.tfvars.example
 ```
+
+#### Additional task:
+##### Fix all previous PRs.
+
+Fixed all the errors according to commentaries from teachers.
+
+
