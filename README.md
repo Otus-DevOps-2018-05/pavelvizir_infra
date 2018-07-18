@@ -7,7 +7,7 @@ pavelvizir Infra repository
 - [Homework-3](#homework-3)
 - [Homework-4](#homework-4)
 - [Homework-5](#homework-5)
-- [Homework-6 aka 'terraform-1'(#homework-6-aka-terraform-1)
+- [Homework-6 aka 'terraform-1'](#homework-6-aka-terraform-1)
 - [Homework-7 aka 'terraform-2'](#homework-7-aka-terraform-2)
 - [Homework-8 aka 'ansible-1'](#homework-8-aka-ansible-1)
 - [Homework-9 aka 'ansible-2'](#homework-9-aka-ansible-2)
