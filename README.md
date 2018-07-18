@@ -1,6 +1,18 @@
 # pavelvizir_infra
 pavelvizir Infra repository
 
+[![Build Status](https://travis-ci.com/Otus-DevOps-2018-05/pavelvizir_infra.svg?branch=master)](https://travis-ci.com/Otus-DevOps-2018-05/pavelvizir_infra)
+
+## Table of contents:
+- [Homework-3](#homework-3)
+- [Homework-4](#homework-4)
+- [Homework-5](#homework-5)
+- [Homework-6 aka 'terraform-1'](#homework-6-aka-terraform-1)
+- [Homework-7 aka 'terraform-2'](#homework-7-aka-terraform-2)
+- [Homework-8 aka 'ansible-1'](#homework-8-aka-ansible-1)
+- [Homework-9 aka 'ansible-2'](#homework-9-aka-ansible-2)
+- [Homework-10 aka 'ansible-3'](#homework-10-aka-ansible-3)
+
 ## Homework-3
 #### Task \#1:  
 ##### Connect to *'someinternalhost'* with one-liner.  
@@ -629,3 +641,96 @@ firefox http://$(terraform output app_external_ip):9292
 # WORKS!
 cd ../terraform/stage && terraform destroy
 ```
+
+## Homework-10 aka 'ansible-3'
+#### Task \#1:  
+##### First 65 pages of homework pdf :-)
+
+What's done:
+ * Created ansible roles:
+   * *db*
+   * *app*
+ * Created ansible environments:
+   * *stage* (default)
+   * *prod*
+ * Practiced with ansible vault:
+   * *credentials.yml*
+ * Practiced with ansible community roles:
+   * *jdauphant.nginx*
+
+> *jdauphant.nginx* subtasks were:
+> 1. open app server's port 80
+> 2. call role from *app.yml*
+
+terraform/modules/app/main.tf:
+```
+resource "google_compute_firewall" "firewall_puma" {
+...
+  allow {
+    ports    = ["9292","80"]
+...
+```
+
+ansible/playbooks/app.yml:
+```
+...
+  roles:
+...
+    - jdauphant.nginx
+```
+
+#### Task \#2\*:  
+##### Use dynamic inventory in *prod* and *stage* environments.  
+
+**First approach, abandoned**:  
+> Same as before, but had to create host_vars in both environments.  
+> Copied gce.py to both environments as well.  
+
+```sh
+mkdir environments/{prod,stage}/host_vars
+cp environments/stage/group_vars/app environments/{prod,stage}/host_vars/reddit-app
+cp environments/stage/group_vars/db environments/{prod,stage}/host_vars/reddit-db
+```
+
+**Second approach**:
+Simply renamed groups in playbooks, group_vars and static inventory:  
+ * *app* -> *tag_reddit-app*
+ * *db*  -> *tag_reddit-db*
+
+#### Task \#3\*:
+##### Make more travis tests.
+
+> packer validate - all  
+> terraform validate, tflint - *prod*,*stage*  
+> ansible-lint - all playbooks  
+> 
+> add build status badge to README.md  
+
+README.md:
+```
+[![Build Status](https://travis-ci.com/Otus-DevOps-2018-05/pavelvizir_infra.svg?branch=master)](https://travis-ci.com/Otus-DevOps-2018-05/pavelvizir_infra)
+```
+
+.travis.yml:
+```yaml
+install:
+- sudo pip install ansible==2.6.1
+- sudo pip install ansible-lint==3.4.23
+- wget -O tflint.zip https://github.com/wata727/tflint/releases/download/v0.7.0/tflint_linux_amd64.zip && sudo unzip -d /usr/bin/ tflint.zip
+- wget -O packer.zip https://releases.hashicorp.com/packer/1.2.5/packer_1.2.5_linux_amd64.zip && sudo unzip -d /usr/bin/ packer.zip
+- wget -O terraform.zip https://releases.hashicorp.com/terraform/0.11.7/terraform_0.11.7_linux_amd64.zip && sudo unzip -d /usr/bin/ terraform.zip
+- touch ~/.ssh/appuser
+- touch ~/.ssh/appuser.pub
+script:
+- cd ansible && ansible-lint -x ANSIBLE0011 -v playbooks/*.yml
+- cd ../ && find packer -name "*.json" -type f -print0 | xargs -0 -n1 packer validate -var-file=packer/variables.json.example
+- cd terraform/stage && terraform init -backend=false && tflint --var-file=terraform.tfvars.example && terraform validate -var-file=terraform.tfvars.example
+- cd ../prod && terraform init -backend=false && tflint --var-file=terraform.tfvars.example && terraform validate -var-file=terraform.tfvars.example
+```
+
+#### Additional task:
+##### Fix all previous PRs.
+
+Fixed all the errors according to commentaries from teachers.
+
+

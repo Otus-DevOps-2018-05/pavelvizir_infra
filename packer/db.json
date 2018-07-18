@@ -4,7 +4,7 @@
     "zone": "europe-west1-b",
     "machine_type": "f1-micro",
     "image_family": "reddit-db-base",
-    "source_image_family": "ubuntu-1604-lts",
+    "source_image_family": null,
     "disk_size": "10",
     "disk_type": "pd-standard",
     "network": "default",
@@ -29,7 +29,7 @@
   "provisioners": [
     {
       "type": "ansible",
-      "playbook_file": "ansible/packer_db.yml"
+      "playbook_file": "ansible/playbooks/packer_db.yml"
     }
   ]
 }
