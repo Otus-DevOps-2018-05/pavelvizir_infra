@@ -525,3 +525,107 @@ inventory = ./inventory.sh
 chmod +x inventory.sh
 ansible all -m ping
 ```
+
+## Homework-9 aka 'ansible-2'
+#### Task \#1:  
+##### First 65 pages of homework pdf :-)
+
+> Had to add switch to provisioning of db server in terraform.  
+> Also added needed outputs to terraform:  
+>   {app,db}_external_ip, db_internal_db  
+
+Created multiple playbooks with the same tasks:  
+ * *reddit_app_one_play.yml*: one play per playbook  
+ * *reddit_app_multiple_plays.yml*: multiple plays per playbook  
+ * *site.yml*: includes multiple playbooks:  
+   * *db.yml*: db play  
+   * *app.yml*: app play  
+   * *deploy.yml*: deploy app play  
+
+#### Task \#2\*:
+##### Select dynamic inventory script and start using it.
+
+> **gce.py** is the most used, tested etc  
+
+Let's install and configure it.
+
+```sh
+wget https://raw.githubusercontent.com/ansible/ansible/devel/contrib/inventory/gce.{ini,py}
+trizen -S python-apache-libcloud
+chmod +x gce.py
+# download json credentials file
+echo "GCE_PARAMS = ('<service_mail>', '/path/to/json_credentials')
+GCE_KEYWORD_PARAMS = {'project': '<project>', 'datacenter': '<zone>'}"\
+> secrets.py
+echo -e '__pycache__\nsecrets.py' >> ../.gitignore
+sed -i 's/inventory = .\/inventory/inventory = .\/gce.py/' ansible.cfg
+./gce.py --list
+```
+> Now there is a problem, as my hosts are **'app'** and **'db'**, but *gce.py* returns **'reddit-app'** and **'reddit-db'**.  
+> Let's fix it by passing variable *'site_prefix'* to playbooks and using that variable in hostnames.  
+
+site.yml:
+```
+...
+- import_playbook: db.yml
+    site_prefix="reddit-"
+...
+```
+{db,app,deploy}.yml:
+```
+...
+hosts: "{{ prefix }}db"
+...
+vars:
+  ...
+  prefix: '{{ vars["site_prefix"] | default("") }}'
+...
+```
+Now test it:
+```sh
+ansible-playbook site.yml --check
+...
+PLAY RECAP ****************************************************************
+reddit-app                 : ok=7    changed=0    unreachable=0    failed=0   
+reddit-db                  : ok=2    changed=0    unreachable=0    failed=0
+```
+Works! :-)  
+
+#### Task \#3:
+##### Change packer's bash scripts to ansible playbooks.  
+
+> Working with *packer_app.yml* as an example here. Working with *packer_db.yml* is the same, only content differs.
+
+packer_app.yml:
+```
+...
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - ruby-full
+        - ruby-bundler
+        - build-essential
+```
+packer/app.json:
+```
+"provisioners": [
+    {
+        "type": "ansible",
+	"playbook_file": "ansible/packer_app.yml"
+    }
+  ]
+```
+Now test it!
+```sh
+packer build --var-file=packer/variables.json packer/app.json
+```
+Test complete solution now after editing *'db'* files:
+```sh
+packer build --var-file=packer/variables.json packer/db.json
+cd terraform/stage && terraform apply
+cd ../../ansible && ansible-playbook site.yml
+firefox http://$(terraform output app_external_ip):9292
+# WORKS!
+cd ../terraform/stage && terraform destroy
+```

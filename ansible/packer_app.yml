@@ -1,0 +1,15 @@
+---
+- name: Install ruby, bundler. Replacement of install_ruby.sh
+  hosts: all
+  become: true
+  tasks:
+    - name: Install ruby and bundler
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - ruby-full
+        - ruby-bundler
+        - build-essential
+        
+

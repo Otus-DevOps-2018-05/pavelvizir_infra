@@ -1,0 +1,22 @@
+---
+- name: deploy app
+  hosts: "{{ prefix }}app"
+  vars:
+    prefix: '{{ vars["site_prefix"] | default("") }}'
+  tasks:
+    - name: Fetch the latest version of application code
+      git:
+        repo: 'https://github.com/express42/reddit.git'
+        dest: /home/appuser/reddit
+        version: monolith
+      notify: restart puma
+
+    - name: bundle install
+      bundler:
+        state: present
+        chdir: /home/appuser/reddit
+
+  handlers:
+    - name: restart puma
+      become: true
+      systemd: name=puma state=restarted

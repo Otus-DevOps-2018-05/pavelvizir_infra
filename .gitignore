@@ -4,3 +4,6 @@ packer/variables.json
 *.tfstate.backup
 *.tfvars
 .terraform/
+*.retry
+__pycache__
+secrets.py
