@@ -12,6 +12,7 @@ pavelvizir Infra repository
 - [Homework-8 aka 'ansible-1'](#homework-8-aka-ansible-1)
 - [Homework-9 aka 'ansible-2'](#homework-9-aka-ansible-2)
 - [Homework-10 aka 'ansible-3'](#homework-10-aka-ansible-3)
+- [Homework-11 aka 'ansible-4'](#homework-11-aka-ansible-4)
 
 ## Homework-3
 #### Task \#1:  
@@ -734,3 +735,58 @@ script:
 Fixed all the errors according to commentaries from teachers.
 
 
+## Homework-11 aka 'ansible-4'
+#### Task \#1:  
+##### First 48 pages of homework pdf :-)
+
+Everything's done according to task:
+ * Install vagrant
+ * Add more files to .gitignore
+ * Create Vagrantfile
+ * Use vagrant to create and provision VMs:
+   * *vagrant up*
+   * *vagrant provision <server>*
+ * Test app *firefox http://10.10.10.20:9292/*
+ * *vagrant destroy -f*
+
+#### Task \#2\*:
+##### Add *nginx* role variables to Vagrantfile.
+
+First way. **Don't like it.**
+
+Vagrantfile:
+```
+      ansible.extra_vars = {
+        "deploy_user" => "vagrant",
+        "nginx_sites": {
+          "default": [
+             "listen 80",
+             "server_name reddit",
+             "location / { proxy_pass http://127.0.0.1:9292; }"
+           ]
+         }
+      }
+```
+
+Second way. **Much better IMO.**
+
+Vagrantfile:
+```
+ansible.raw_arguments = ["--extra-vars", "@vagrant_nginx_vars"]
+```
+
+vagrant_nginx_vars:
+```yaml
+nginx_sites:
+  default:
+    - listen 80
+    - server_name reddit
+    - location / {
+        proxy_pass http://127.0.0.1:9292;
+      }
+```
+
+#### Task \#3:
+##### TBD.
+
+TBD
