@@ -786,7 +786,44 @@ nginx_sites:
       }
 ```
 
-#### Task \#3:
-##### TBD.
+#### Task \#3:  
+##### Write molecule test to check if mongo port listening.  
+ansible/roles/db/molecule/default/tests/test_default.py:  
+```python
+# check if mongo is listening
+def test_mongo_listening(host):
+    mongo = host.socket("tcp://0.0.0.0:27017")
+    assert mongo.is_listening
+```
+```sh
+molecule verify
+```
+
+#### Task \#4:  
+##### Use ansible roles *db* and *app* for packer.
+> *db* role for example. *app* is the same.  
+ansible/playbooks/packer_db.yml:
+```yaml
+  roles:
+    - db
+```
+packer/db.json: 
+```json
+  "provisioners": [
+    {
+      "type": "ansible",
+      "playbook_file": "ansible/playbooks/packer_db.yml",
+      "extra_arguments": ["--tags", "install"],
+      "ansible_env_vars": ["ANSIBLE_ROLES_PATH={{ pwd }}/ansible/roles"]
+    }
+  ]
+```
+**Now run it.**
+```sh
+packer build --var-file=packer/variables.json packer/db.json
+```
+
+#### Task \#5\*:  
+##### Move *db* role to separate repo. Add Travis tests and badge, add to slack.
 
 TBD

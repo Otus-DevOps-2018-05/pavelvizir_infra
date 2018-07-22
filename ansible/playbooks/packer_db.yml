@@ -2,24 +2,5 @@
 - name: Install mongo (prepare remote repo), emable service. Replacement of install_mongodb.sh
   hosts: all
   become: true
-  tasks:
-    - name: Prepare key
-      apt_key:
-        id: EA312927
-        keyserver: keyserver.ubuntu.com
-
-    - name: Add repo sources
-      apt_repository:
-        repo: deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.2 multiverse
-        state: present
-
-    - name: Install mongo
-      apt:
-        name: mongodb-org
-        state: present
-        update_cache: yes
-
-    - name: Enable mongod service
-      service:
-        name: mongod
-        enabled: yes
+  roles:
+    - db
