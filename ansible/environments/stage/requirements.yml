@@ -1,3 +1,8 @@
 --- 
 - src: jdauphant.nginx 
   version: v2.18.1
+
+- src: git+https://github.com/pavelvizir/devops_ansible_role_db
+  version: master
+  name: db
+  scm: git
