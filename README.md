@@ -12,6 +12,7 @@ pavelvizir Infra repository
 - [Homework-8 aka 'ansible-1'](#homework-8-aka-ansible-1)
 - [Homework-9 aka 'ansible-2'](#homework-9-aka-ansible-2)
 - [Homework-10 aka 'ansible-3'](#homework-10-aka-ansible-3)
+- [Homework-11 aka 'ansible-4'](#homework-11-aka-ansible-4)
 
 ## Homework-3
 #### Task \#1:  
@@ -734,3 +735,190 @@ script:
 Fixed all the errors according to commentaries from teachers.
 
 
+## Homework-11 aka 'ansible-4'
+#### Task \#1:  
+##### First 48 pages of homework pdf :-)
+
+Everything's done according to task:
+ * Install vagrant
+ * Add more files to .gitignore
+ * Create Vagrantfile
+ * Use vagrant to create and provision VMs:
+   * *vagrant up*
+   * *vagrant provision <server>*
+ * Test app *firefox http://10.10.10.20:9292/*
+ * *vagrant destroy -f*
+
+#### Task \#2\*:
+##### Add *nginx* role variables to Vagrantfile.
+
+First way. **Don't like it.**
+
+Vagrantfile:
+```
+      ansible.extra_vars = {
+        "deploy_user" => "vagrant",
+        "nginx_sites": {
+          "default": [
+             "listen 80",
+             "server_name reddit",
+             "location / { proxy_pass http://127.0.0.1:9292; }"
+           ]
+         }
+      }
+```
+
+Second way. **Much better IMO.**
+
+Vagrantfile:
+```
+ansible.raw_arguments = ["--extra-vars", "@vagrant_nginx_vars"]
+```
+
+vagrant_nginx_vars:
+```yaml
+nginx_sites:
+  default:
+    - listen 80
+    - server_name reddit
+    - location / {
+        proxy_pass http://127.0.0.1:9292;
+      }
+```
+
+#### Task \#3:  
+##### Write molecule test to check if mongo port listening.  
+ansible/roles/db/molecule/default/tests/test_default.py:  
+```python
+# check if mongo is listening
+def test_mongo_listening(host):
+    mongo = host.socket("tcp://0.0.0.0:27017")
+    assert mongo.is_listening
+```
+```sh
+molecule verify
+```
+
+#### Task \#4:  
+##### Use ansible roles *db* and *app* for packer.
+> *db* role for example. *app* is the same.  
+
+ansible/playbooks/packer_db.yml:
+```yaml
+  roles:
+    - db
+```
+packer/db.json: 
+```json
+  "provisioners": [
+    {
+      "type": "ansible",
+      "playbook_file": "ansible/playbooks/packer_db.yml",
+      "extra_arguments": ["--tags", "install"],
+      "ansible_env_vars": ["ANSIBLE_ROLES_PATH={{ pwd }}/ansible/roles"]
+    }
+  ]
+```
+**Now run it.**
+```sh
+packer build --var-file=packer/variables.json packer/db.json
+```
+
+#### Task \#5\*:  
+##### Move *db* role to separate repo. Add Travis tests and badge, add notifications to slack.  
+
+> A lot of work to create role's repo and prepare Travis with GCE and Slack.  
+
+1. Create role's repo [devops_ansible_role_db](https://github.com/pavelvizir/devops_ansible_role_db).  
+2. `git clone` repo.  
+3. Move role's content.  
+4. Create separate GCE service account, download credentials json.  
+5. Login to travis-ci.org, enable role's repo there.  
+6. Generate ssh key for travis and place it to GCE metadata.  
+```sh
+ ssh-keygen -t rsa -f devops_ansible_role_db_gce_ssh_key_travis -C 'travis' -q -N ''
+```
+7. Place travis badge in README.md  
+[![Build Status](https://travis-ci.org/pavelvizir/devops_ansible_role_db.svg?branch=master)](https://travis-ci.org/pavelvizir/devops_ansible_role_db)
+8. Install travis app.  
+```sh
+gem install travis -v 1.8.8 --no-rdoc --no-ri
+```
+9. Prepare .travis.yml.  
+```yaml
+language: python
+python:
+  - '3.6'
+install:
+  - pip install ansible==2.6.1 molecule==2.16.0 apache-libcloud==2.3.0 pycrypto==2.6.1
+script:
+  - molecule create
+  - molecule converge
+  - molecule verify
+after_script:
+  - molecule destroy
+```
+10. Add travis notifications to slack.  
+ * Login to slack space -> Apps -> Add configuration -> Post to channel  
+ * Save token  
+ * `travis encrypt` "\<slack space\>:\<token\>\#\<channel\>" --add notifications.slack.rooms  
+11. Add GCE info to travis.  
+ * `travis encrypt` GCE_SERVICE_ACCOUNT_EMAIL='\<service_account_email\>' --add  
+ * `travis encrypt` GCE_CREDENTIALS_FILE="$(pwd)/\<path_to_json\>" --add  
+ * `travis encrypt` GCE_PROJECT_ID='\<project_id\>' --add  
+12. Make encrypted tar.
+```sh
+tar cvf secrets.tar GCE_credentials.json private_key
+travis login
+travis encrypt-file secrets.tar --add
+```
+13. Add encrypted tar unpack and ssh key placement to *.travis.yml*.
+```
+  - tar xvf secrets.tar
+  - mv private_key /home/travis/.ssh
+  - chmod 0600 /home/travis/.ssh/private_key
+```
+14. Prepare molecule for GCE.
+```sh
+rm -rf molecule
+molecule init scenario --scenario-name default -r devops_ansible_role_db -d gce
+```
+15. Prepare molecule
+ * [tests](https://raw.githubusercontent.com/pavelvizir/devops_ansible_role_db/master/molecule/default/tests/test_default.py).  
+ * [playbook.yml](https://raw.githubusercontent.com/pavelvizir/devops_ansible_role_db/master/molecule/default/playbook.yml).  
+ * GCE parameters in [molecule.yml](https://raw.githubusercontent.com/pavelvizir/devops_ansible_role_db/master/molecule/default/molecule.yml).  
+16. Allow ssh to GCE travis VM.
+ * Create GCE VPC rule to allow ssh to tag \<tag\>.  
+ * Add tag to *create.yml*:
+```
+  tags:
+    - instance-travis
+```
+17. Prepare .gitignore.
+```
+*.log
+*.tar
+*.pub
+devops-ansible-role-db-gce-credentials.json
+google_compute_engine
+.yamllint
+__pycache__
+```
+18. Final steps.
+```sh
+git add <everything>
+git commit
+git push
+``` 
+
+> Now make use of create role's repo.  
+
+requirements.yml  
+```yaml
+- src: git+https://github.com/pavelvizir/devops_ansible_role_db
+  version: master
+  name: db
+  scm: git
+```
+
+`ansible-galaxy` install -r environments/stage/requirements.yml  

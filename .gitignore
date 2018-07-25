@@ -9,3 +9,10 @@ __pycache__
 secrets.py
 jdauphant.nginx
 vault.key
+.vagrant/
+*.log
+*.pyc
+.molecule
+.cache
+.pytest_cache
+.yamllint
